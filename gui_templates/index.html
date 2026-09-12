@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MINTO - Token Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #e0e0e0;
+            --bg: #000000;
+            --header-bg: #080808;
+            --card-bg: #0d0d0d;
+            --row-bg: #141414;
+            --input-bg: #1a1a1a;
+            --border: #262626;
+            --border-hover: #404040;
+            --text: #ededed;
+            --text-dim: #888888;
+            --radius: 8px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg); 
+            color: var(--text); 
+            font-size: 13px; 
+            overflow: hidden; 
+            height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #262626; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #404040; }
+
+        /* Main App Layout (Header Top) */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            background: var(--bg);
+        }
+
+        /* Top Header / Navigation */
+        .header {
+            background: var(--header-bg);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .brand-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px 12px 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        /* Top Navigation Links with Separators */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            padding: 8px 24px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: var(--header-bg);
+            overflow-x: auto;
+        }
+
+        .tab {
+            display: flex;
+            align-items: center;
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-dim);
+            font: 600 13px 'Plus Jakarta Sans', sans-serif;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--text);
+            background: #141414;
+            border-color: var(--border);
+        }
+
+        .tab.on {
+            color: #ffffff;
+            background: #222222;
+            border-color: #404040;
+            font-weight: 700;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .view {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+            padding: 32px;
+        }
+
+        .view.on { display: block; }
+
+        /* Cards */
+        .c {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .c:hover { border-color: var(--border-hover); }
+
+        .c h3 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .c h2 { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+        .c .sub { font-size: 12px; color: var(--text-dim); margin-bottom: 20px; }
+
+        /* Accordion Styles (Improved Animation) */
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+        .accordion-header h2 { margin-bottom: 0; }
+        .accordion-icon {
+            font-size: 10px;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s;
+            color: #666;
+        }
+        .accordion-header.open .accordion-icon {
+            transform: rotate(90deg);
+            color: #707ebe;
+        }
+        .accordion-content {
+            height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transition: height 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-top 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .accordion-content.open {
+            opacity: 1;
+            margin-top: 16px;
+        }
+
+        /* Row Component */
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: var(--row-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .row .lbl { font-size: 13px; font-weight: 600; }
+        .row .desc { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+        /* Inputs & Controls */
+        input[type=text], input[type=number], input[type=password], input[type=url], select {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font: 500 13px 'Plus Jakarta Sans', sans-serif;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: #666666;
+        }
+
+        input[type=number] { width: 80px; text-align: center; }
+
+        /* Toggle Switch */
+        .sw { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+        .sw input { opacity: 0; width: 0; height: 0; }
+        .sw span {
+            position: absolute; inset: 0;
+            background: #222222;
+            border-radius: 20px; cursor: pointer; transition: 0.3s;
+            border: 1px solid var(--border);
+        }
+        .sw span::before {
+            content: ''; position: absolute;
+            width: 14px; height: 14px; left: 3px; top: 3px;
+            background: #666666; border-radius: 50%; transition: 0.3s;
+        }
+        .sw input:checked + span { background: #404040; border-color: #666666; }
+        .sw input:checked + span::before { transform: translateX(18px); background: #ffffff; }
+
+        /* Buttons */
+        .btn {
+            font: 600 13px 'Plus Jakarta Sans', sans-serif;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-p {
+            background: #e0e0e0;
+            color: #000000;
+            border-color: #ffffff;
+            font-weight: 700;
+        }
+
+        .btn-p:hover {
+            background: #ffffff;
+        }
+
+        .btn-s {
+            background: #1a1a1a;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-s:hover {
+            background: #262626;
+            border-color: var(--border-hover);
+        }
+
+        .actions { display: flex; gap: 10px; margin-top: 15px; }
+
+        /* Tool Cards Grid */
+        .tools { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+        .tool {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 20px;
+            transition: all 0.25s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .tool:hover { border-color: var(--border-hover); }
+        .tool h4 { font-size: 15px; margin-bottom: 6px; }
+        .tool p { font-size: 12px; color: var(--text-dim); margin-bottom: 16px; line-height: 1.5; }
+
+        /* Terminal Drawer / View */
+        .terminal-view {
+            display: none;
+            position: absolute;
+            inset: 0;
+            background: var(--bg);
+            z-index: 100;
+            padding: 32px;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .term {
+            background: #050505;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            color: #ffffff;
+            font: 13px/1.6 'JetBrains Mono', monospace;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .t-s { color: #ffffff; font-weight: 700; }
+
+        /* Grid Humanizer */
+        .hz { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin-top: 12px; }
+        .hz-c { display: flex; justify-content: space-between; align-items: center; background: var(--row-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 14px; font-size: 12px; }
+
+        /* Toast Popup */
+        .toasts { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; }
+        .toast {
+            background: var(--row-bg);
+            border: 1px solid var(--border-hover);
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+
+        .mf label, .link-box label { display: block; font-size: 11px; color: var(--text-dim); margin-bottom: 6px; }
+        .mf input, .link-box input { width: 100%; }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container Layout -->
+    <div class="app-container" id="app">
+        
+        <!-- Top Header & Navigation Bar -->
+        <header class="header">
+            <div class="brand-bar">
+                <div class="brand">
+                    <div class="brand-text">
+                        <h1>MINTO</h1>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="nav-tabs">
+                <button class="tab on" data-v="gen">Generator</button>
+                <button class="tab" data-v="tools">Tools</button>
+                <button class="tab" data-v="setup">Files</button>
+                <button class="tab" data-v="term">Terminal</button>
+                <button class="tab" data-v="settings">Settings</button>
+            </nav>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="content-area">
+            
+            <!-- GENERATOR -->
+            <div class="view on" id="v-gen">
+                <div class="c">
+                    <h2>Token Generator</h2>
+                    <div class="sub">Start the high-performance token generation process.</div>
+                    <div class="row">
+                        <div class="lbl">Target Count (0 = Unlimited)</div>
+                        <input type="number" id="gen-target-count" value="0" min="0" style="width:100px;">
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-p" onclick="runGenerator()" id="btn-gen">Start Engine</button>
+                        <button class="btn btn-s" onclick="stop()">Stop</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TOOLS -->
+            <div class="view" id="v-tools">
+                <div class="tools">
+                    <div class="tool">
+                        <div>
+                            <h4>Token Checker</h4>
+                            <p>Validate tokens, nitro, and account flags.</p>
+                        </div>
+                        <button class="btn btn-s" onclick="run('checker')">Launch</button>
+                    </div>
+                    <div class="tool">
+                        <div>
+                            <h4>Proxy Checker</h4>
+                            <p>Speed test and filter active proxy lists.</p>
+                        </div>
+                        <button class="btn btn-s" onclick="run('proxy_checker')">Launch</button>
+                    </div>
+                    <div class="tool">
+                        <div>
+                            <h4>Humanizer</h4>
+                            <p>Customize profile pics, bios, and banners.</p>
+                        </div>
+                        <button class="btn btn-s" onclick="showHumanizerDialog()">Launch</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETUP (FILEs) -->
+            <div class="view" id="v-setup">
+                <div class="c" style="display:flex; flex-direction:column; height: calc(100vh - 160px);">
+                    <h3>File Management</h3>
+                    <div class="sub">Browse and edit text files from input/ and output/ folders.</div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div>
+                            <div class="lbl" style="margin-bottom: 6px;">Input Files</div>
+                            <select id="input-files-list" onchange="selectInputFile()" style="width:100%; padding: 8px 12px; background:var(--input-bg); border:1px solid var(--border); color:var(--text); border-radius:8px; font:500 13px 'Plus Jakarta Sans';">
+                                <option value="">-- Select Input File --</option>
+                            </select>
+                        </div>
+                        <div>
+                            <div class="lbl" style="margin-bottom: 6px;">Output Files</div>
+                            <select id="output-files-list" onchange="selectOutputFile()" style="width:100%; padding: 8px 12px; background:var(--input-bg); border:1px solid var(--border); color:var(--text); border-radius:8px; font:500 13px 'Plus Jakarta Sans';">
+                                <option value="">-- Select Output File --</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px;">
+                        <div class="lbl" style="margin-bottom: 6px;">File Name</div>
+                        <div style="padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px; font:500 13px 'JetBrains Mono'; color:var(--text-dim);" id="current-file-display">No file selected</div>
+                    </div>
+                    
+                    <textarea id="input-editor" style="flex:1; background:var(--input-bg); color:var(--text); border:1px solid var(--border); border-radius:8px; padding:16px; font:13px/1.5 'JetBrains Mono',monospace; resize:none; margin: 0 0 12px 0;" placeholder="Select a file to view and edit..."></textarea>
+                    
+                    <div class="actions" style="justify-content:flex-end;">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-right:auto;">
+                            Auto Save File
+                            <label class="sw"><input type="checkbox" id="file-autosave" onchange="toggleAutoSave('file')"><span></span></label>
+                        </label>
+                        <button class="btn btn-s" onclick="refreshFileLists()">Refresh</button>
+                        <button class="btn btn-p" onclick="saveCurrentFile()">Save File</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TERMINAL OVERLAY / VIEW -->
+            <div class="terminal-view" id="v-term">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <h2>Console Output</h2>
+                        <p style="font-size:12px; color:var(--text-dim);">Live process logs and status</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn btn-s" onclick="document.getElementById('tm').innerHTML=''">Clear Console</button>
+                        <button class="btn btn-s" id="btn-kill" style="color:var(--text); border-color:var(--border);" onclick="stop()">Stop Execution</button>
+                    </div>
+                </div>
+                
+                <div class="term" id="tm"></div>
+
+                <div id="gen-progress-container" class="c" style="display:none; margin:0;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-weight:700; font-size:12px;">Operation Progress</span>
+                        <span id="pb-count" style="font-family:'JetBrains Mono'; font-size:12px;">0/0</span>
+                    </div>
+                    <div id="pb-track" style="width:100%; height:6px; background:var(--row-bg); border-radius:3px; overflow:hidden; margin-bottom:12px;">
+                        <div id="pb-fill" style="width:0%; height:100%; background:#ffffff; transition:width 0.2s;"></div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(5,1fr); text-align:center; gap:8px;">
+                        <div><div id="stat-gen" style="font-size:18px; font-weight:800; color:#ffffff;">0</div><div style="font-size:10px; color:var(--text-dim);">Generated</div></div>
+                        <div><div id="stat-ev" style="font-size:18px; font-weight:800; color:#ffffff;">0</div><div style="font-size:10px; color:var(--text-dim);">Email Verified</div></div>
+                        <div><div id="stat-cs" style="font-size:18px; font-weight:800; color:#ffffff;">0</div><div style="font-size:10px; color:var(--text-dim);">Captcha Solved</div></div>
+                        <div><div id="stat-cf" style="font-size:18px; font-weight:800; color:#ffffff;">0</div><div style="font-size:10px; color:var(--text-dim);">Captcha Failed</div></div>
+                        <div><div id="stat-total" style="font-size:18px; font-weight:800; color:#ffffff;">0</div><div style="font-size:10px; color:var(--text-dim);">Total</div></div>
+                    </div>
+                    <div id="pb-details" style="font-size:11px; color:var(--text-dim); text-align:center; margin-top:10px; font-family:'JetBrains Mono';">Awaiting output...</div>
+                </div>
+            </div>
+
+            <!-- SETTINGS -->
+            <div class="view" id="v-settings">
+                <div class="c">
+                    <h3>General Settings</h3>
+                    <div class="row">
+                        <div class="lbl">Email Verification</div>
+                        <label class="sw"><input type="checkbox" id="cfg-verify"><span></span></label>
+                    </div>
+                    <div class="row">
+                        <div class="lbl">IP VANISH Rotation</div>
+                        <label class="sw"><input type="checkbox" id="cfg-ipvanish"><span></span></label>
+                    </div>
+                </div>
+
+                <div class="c">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin-bottom: 4px;">IP VANISH - Ignore Raw IPs</h3>
+                            <div class="sub" style="margin-bottom: 0;">Add your raw ISP IPs to ignore list. These IPs will be skipped during rotation.</div>
+                        </div>
+                        <button id="ip-visibility-toggle" class="btn btn-s" onclick="toggleIPVisibility()" style="padding: 8px 12px; font-size: 13px; font-weight: 600; min-width: 80px;">Hide</button>
+                    </div>
+                    <div id="ignore-ips-list" style="max-height: 250px; overflow-y: auto; background: var(--row-bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 12px; font-size: 16px; font-family: 'JetBrains Mono', monospace; font-weight: 600;"></div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 12px;">
+                        <input type="text" id="new-ignore-ip" placeholder="Add IP (e.g., 192.168.1.1)" style="flex: 1;">
+                        <button class="btn btn-s" onclick="addIgnoreIP()">Add IP</button>
+                        <button class="btn btn-s" onclick="addCurrentIP()">Add Current IP</button>
+                    </div>
+                    <button class="btn btn-s" onclick="clearIgnoreIPs()">Clear All IPs</button>
+                </div>
+
+                <div class="c">
+                    <h3>Performance & Threads</h3>
+                    <div class="row"><div class="lbl">Generator Threads</div><input type="number" id="th-gen" value="1" min="1"></div>
+                    <div class="row"><div class="lbl">Joiner Threads</div><input type="number" id="th-joiner" value="100" min="1"></div>
+                    <div class="row"><div class="lbl">Proxy Checker Threads</div><input type="number" id="th-proxy" value="50" min="1"></div>
+                    <div class="row"><div class="lbl">Token Checker Threads</div><input type="number" id="th-checker" value="10" min="1"></div>
+                    <div class="row"><div class="lbl">Humanizer Threads</div><input type="number" id="th-hz" value="3" min="1"></div>
+                    <div class="row"><div class="lbl">Rate Limit Countdown (sec)</div><input type="number" id="th-ratelimit" value="150" min="10"></div>
+                </div>
+
+                <div class="c">
+                    <h3>Humanizer Options</h3>
+                    <div class="row">
+                        <div class="lbl">Enable Humanizer</div>
+                        <label class="sw"><input type="checkbox" id="cfg-hz" onchange="toggleHz(this.checked)"><span></span></label>
+                    </div>
+                    <div id="hz-opts" style="display:none;">
+                        <div class="hz">
+                            <div class="hz-c"><span>Avatar</span><label class="sw"><input type="checkbox" id="hz-avatar"><span></span></label></div>
+                            <div class="hz-c"><span>Bio</span><label class="sw"><input type="checkbox" id="hz-bio"><span></span></label></div>
+                            <div class="hz-c"><span>Display Name</span><label class="sw"><input type="checkbox" id="hz-dn"><span></span></label></div>
+                            <div class="hz-c"><span>Pronouns</span><label class="sw"><input type="checkbox" id="hz-pn"><span></span></label></div>
+                            <div class="hz-c"><span>Banner</span><label class="sw"><input type="checkbox" id="hz-bn"><span></span></label></div>
+                            <div class="hz-c"><span>HypeSquad</span><label class="sw"><input type="checkbox" id="hz-hs"><span></span></label></div>
+                        </div>
+                        <div class="row" style="margin-top:10px;">
+                            <div class="lbl">Retries</div>
+                            <input type="number" id="hz-ret" value="3" min="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="c">
+                    <h3>Mail Provider</h3>
+                    <div class="row">
+                        <div class="lbl">Provider</div>
+                        <div style="padding: 8px 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 8px;">TempMail.lol</div>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">No configuration needed - TempMail.lol is ready to use.</p>
+                </div>
+
+                <div class="actions" style="justify-content: flex-end; margin-bottom: 30px;">
+                    <label style="display:flex; align-items:center; gap:8px; font-size:12px; margin-right:auto;">
+                        Auto Save Settings
+                        <label class="sw"><input type="checkbox" id="cfg-autosave" onchange="toggleAutoSave('settings')"><span></span></label>
+                    </label>
+                    <button class="btn btn-s" onclick="loadCfg()">Reload</button>
+                    <button class="btn btn-p" onclick="saveCfg()">Save Configuration</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="toasts" id="toasts"></div>
+
+    <script>
+    // Tab switching logic
+    document.querySelectorAll('.tab').forEach(t => {
+        t.addEventListener('click', () => {
+            const termView = document.getElementById('v-term');
+            
+            if (t.dataset.v === 'term') {
+                if (termView.style.display === 'flex') {
+                    termView.style.display = 'none';
+                    t.classList.remove('on');
+                } else {
+                    termView.style.display = 'flex';
+                    t.classList.add('on');
+                }
+                return;
+            } else {
+                termView.style.display = 'none';
+            }
+            
+            document.querySelectorAll('.tab').forEach(b => b.classList.remove('on'));
+            document.querySelectorAll('.view').forEach(v => { v.classList.remove('on'); v.style.display = 'none'; });
+            
+            t.classList.add('on');
+            const el = document.getElementById('v-' + t.dataset.v);
+            if(el) { 
+                el.style.display = 'block'; 
+                el.classList.add('on'); 
+                
+                // Files タブが選択されたときにファイル一覧を自動リフレッシュ
+                if (t.dataset.v === 'setup') {
+                    console.log('[TAB] Setup tab activated, refreshing file lists...');
+                    refreshFileLists();
+                }
+            }
+        });
+    });
+
+    // Accordion Toggle (Smooth Animation)
+    function toggleAccordion(header) {
+        header.classList.toggle('open');
+        const content = header.nextElementSibling;
+        
+        if (content.classList.contains('open')) {
+            // 閉じるときの処理
+            content.style.height = content.scrollHeight + 'px';
+            let reflow = content.offsetHeight; // リフロー発生
+            content.classList.remove('open');
+            content.style.height = '0px';
+        } else {
+            // 開くときの処理
+            content.classList.add('open');
+            content.style.height = content.scrollHeight + 'px';
+            
+            content.addEventListener('transitionend', function handler() {
+                if (content.classList.contains('open')) {
+                    content.style.height = 'auto';
+                }
+                content.removeEventListener('transitionend', handler);
+            });
+        }
+    }
+
+    function toggleLinkInput() {
+        document.getElementById('link-input').style.display = document.getElementById('j-mode').value === 'link' ? 'block' : 'none';
+    }
+
+    function toggleHz(on) { document.getElementById('hz-opts').style.display = on ? 'block' : 'none'; }
+
+    // Dashboard & Terminal Logic
+    let _lt = null;
+    let isReloadingConfig = false;
+    
+    function parseProgress(lineText) {
+        if (!lineText) return;
+        let m = lineText.match(/\[([▓▒░=*-]+)[\s\.]*\]\s*(\d+)%\s*(.*)/);
+        if (m) {
+            document.getElementById('gen-progress-container').style.display = 'block';
+            let details = m[3].trim();
+            if (details.length > 70) details = details.substring(0, 67) + '...';
+            document.getElementById('pb-details').textContent = details;
+        }
+    }
+
+    async function updateDashboardMetrics() {
+        if (!window.pywebview?.api) return;
+        const st = await pywebview.api.get_status_updates();
+        if(st) {
+            if (st.config_changed && !isReloadingConfig) {
+                isReloadingConfig = true;
+                await loadCfg();
+                isReloadingConfig = false;
+                toast('Settings auto-reloaded');
+            }
+            
+            document.getElementById('gen-progress-container').style.display = 'block';
+            document.getElementById('pb-fill').style.width = st.progress + '%';
+            
+            let val1 = st.success, val2 = st.failed, val3 = st.pending;
+            let btn1Label = 'Successful', btn2Label = 'Failed', btn3Label = 'Pending';
+            
+            if (st.engine === 'generator') {
+                let det = `Generated: ${st.success || 0} | Cap: ${st.cap_solved || 0}/${st.cap_fail || 0} | Locked: ${st.failed > 0 ? '?' : 0}`;
+                document.getElementById('pb-details').textContent = det;
+                document.getElementById('pb-track').style.display = 'none';
+                btn1Label = 'Generated'; val1 = st.success || '0';
+                btn2Label = 'Email Verified'; val2 = st.ver || '0';
+                btn3Label = 'Captcha Solved'; val3 = st.cap_solved || '0';
+            } else {
+                document.getElementById('pb-track').style.display = 'block';
+            }
+            
+            if (st.engine === 'generator') {
+                // Generator mode - show Generated | Email Verified | Captcha Solved | Captcha Failed | Total
+                document.getElementById('stat-gen').textContent = st.success || '0';
+                document.getElementById('stat-ev').textContent = st.ver || '0';
+                document.getElementById('stat-cs').textContent = st.cap_solved || '0';
+                document.getElementById('stat-cf').textContent = st.cap_fail || '0';
+                document.getElementById('stat-total').textContent = st.total || '0';
+            } else {
+                // Other engines
+                document.getElementById('stat-gen').textContent = val1;
+                document.getElementById('stat-ev').textContent = val2;
+                document.getElementById('stat-cs').textContent = val3;
+                document.getElementById('stat-cf').textContent = st.failed || '0';
+                document.getElementById('stat-total').textContent = st.total || '0';
+            }
+            
+            let processed = (parseInt(st.success) || 0) + (parseInt(st.failed) || 0);
+            let total = parseInt(st.total) || 0;
+            document.getElementById('pb-count').textContent = processed + '/' + total;
+        }
+    }
+
+    const ansiRegex = /\x1b\[([0-9;]+)m/g;
+    const basicMap = { 30: "grey", 31: "#888888", 32: "#ffffff", 33: "#cccccc", 34: "#ffffff", 35: "#ffffff", 36: "#ffffff", 37: "#ffffff", 90: "grey" };
+
+    function ansiToHtml(msg) {
+        let openTags = [];
+        let htmlLog = msg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        let res = htmlLog.replace(ansiRegex, (match, codes) => {
+            const parts = codes.split(";");
+            const first = parseInt(parts[0]);
+            
+            if (first === 0) {
+                if (openTags.length > 0) return openTags.pop();
+                return "";
+            }
+            
+            if (first === 38 && parts[1] === "2") {
+                const [r, g, b] = parts.slice(2).map(Number);
+                openTags.push("</span>");
+                return `<span style="color:rgb(${r},${g},${b});font-weight:inherit;">`;
+            }
+            
+            if (basicMap[first]) {
+                openTags.push("</span>");
+                return `<span style="color:${basicMap[first]}">`;
+            }
+            
+            return ""; 
+        });
+        return res + openTags.reverse().join("");
+    }
+
+    function startLogs() {
+        if (_lt) return;
+        const t = document.getElementById('tm');
+        _lt = setInterval(async () => {
+            if (!window.pywebview?.api) return;
+            const o = await pywebview.api.get_logs();
+            if (o) {
+                const isScrolledToBottom = t.scrollHeight - t.clientHeight <= t.scrollTop + 50;
+                let lines = o.split('\n');
+                for (let j = 0; j < lines.length - 1; j++) {
+                    let lineStr = lines[j];
+                    if (lineStr.includes('\r')) lineStr = lineStr.substring(lineStr.lastIndexOf('\r') + 1);
+                    
+                    if (lineStr.startsWith('[[UPDATE]]')) {
+                        const content = lineStr.substring(10);
+                        let lastChild = t.lastChild;
+                        if (lastChild && lastChild.dataset.updateable === 'true') {
+                            lastChild.innerHTML = ansiToHtml(content) + '\n';
+                        } else {
+                            let span = document.createElement('span');
+                            span.dataset.updateable = 'true';
+                            span.innerHTML = ansiToHtml(content) + '\n';
+                            t.appendChild(span);
+                        }
+                    } else {
+                        parseProgress(lineStr);
+                        let span = document.createElement('span');
+                        span.innerHTML = ansiToHtml(lineStr) + '\n';
+                        t.appendChild(span);
+                    }
+                }
+                while (t.childNodes.length > 800) t.firstChild.remove();
+                if (isScrolledToBottom) t.scrollTop = t.scrollHeight;
+            }
+            updateDashboardMetrics();
+        }, 50);
+    }
+
+    async function run(target, data = null) {
+        const termView = document.getElementById('v-term');
+        termView.style.display = 'flex';
+        document.querySelector('[data-v="term"]').classList.add('on');
+        sysLog('Starting process: ' + target);
+        await pywebview.api.start_process(target, data);
+    }
+
+    async function runGenerator() {
+        const targetCount = parseInt(document.getElementById('gen-target-count').value) || 0;
+        run('generator', targetCount.toString());
+    }
+
+    async function stop() {
+        sysLog('Halting operation...');
+        await pywebview.api.stop_process();
+    }
+
+    function sysLog(msg) {
+        const t = document.getElementById('tm');
+        const s = document.createElement('span');
+        s.className = 't-s';
+        s.textContent = '[MINTO] ' + msg + '\n';
+        t.appendChild(s);
+        t.scrollTop = t.scrollHeight;
+    }
+
+    let _cfg = {};
+    function updateMail() {
+    }
+
+    async function loadCfg() {
+        if (!window.pywebview?.api) return;
+        const c = await pywebview.api.load_config();
+        _cfg = c;
+        
+        // verification settings
+        document.getElementById('cfg-verify').checked = c.verification?.enabled ?? true;
+        
+        // IP VANISH settings
+        document.getElementById('cfg-ipvanish').checked = c.ip_vanish?.enabled ?? false;
+        
+        // Load ignore IPs list
+        const ignoreIps = c.ip_vanish?.ignore_raw_ips ?? [];
+        refreshIgnoreIPsList(ignoreIps);
+        
+        // threading settings
+        const th = c.threading || {};
+        document.getElementById('th-gen').value = th.generator ?? c.threads ?? 1;
+        document.getElementById('th-joiner').value = th.joiner ?? 100;
+        document.getElementById('th-proxy').value = th.proxy_checker ?? 50;
+        document.getElementById('th-checker').value = th.checker ?? 10;
+        document.getElementById('th-hz').value = th.humanizer ?? 3;
+        document.getElementById('th-ratelimit').value = th.ratelimit_countdown ?? 150;
+        
+        // humanizer settings
+        const hz = c.humanizer || {};
+        document.getElementById('cfg-hz').checked = hz.enabled ?? false;
+        document.getElementById('hz-avatar').checked = hz.avatar ?? true;
+        document.getElementById('hz-bio').checked = hz.bio ?? true;
+        document.getElementById('hz-dn').checked = hz.display_name ?? true;
+        document.getElementById('hz-pn').checked = hz.pronouns ?? true;
+        document.getElementById('hz-bn').checked = hz.banner ?? false;
+        document.getElementById('hz-hs').checked = hz.hypesquad ?? false;
+        document.getElementById('hz-ret').value = hz.retries ?? 3;
+        toggleHz(hz.enabled ?? false);
+        
+        toast('Configuration loaded');
+    }
+
+    async function saveCfg(autosaved = false) {
+        if (!window.pywebview?.api) return;
+        
+        // verification settings
+        if (!_cfg.verification) _cfg.verification = {};
+        _cfg.verification.enabled = document.getElementById('cfg-verify').checked;
+        
+        // IP VANISH settings
+        if (!_cfg.ip_vanish) _cfg.ip_vanish = {};
+        _cfg.ip_vanish.enabled = document.getElementById('cfg-ipvanish').checked;
+        // ignore_raw_ips は addIgnoreIP/removeIgnoreIP で既に _cfg に保存されている
+        
+        // threading settings
+        if (!_cfg.threading) _cfg.threading = {};
+        _cfg.threading.generator = parseInt(document.getElementById('th-gen').value) || 1;
+        _cfg.threading.joiner = parseInt(document.getElementById('th-joiner').value) || 100;
+        _cfg.threading.proxy_checker = parseInt(document.getElementById('th-proxy').value) || 50;
+        _cfg.threading.checker = parseInt(document.getElementById('th-checker').value) || 10;
+        _cfg.threading.humanizer = parseInt(document.getElementById('th-hz').value) || 3;
+        _cfg.threading.ratelimit_countdown = parseInt(document.getElementById('th-ratelimit').value) || 150;
+        
+        // humanizer settings
+        if (!_cfg.humanizer) _cfg.humanizer = {};
+        _cfg.humanizer.enabled = document.getElementById('cfg-hz').checked;
+        _cfg.humanizer.avatar = document.getElementById('hz-avatar').checked;
+        _cfg.humanizer.bio = document.getElementById('hz-bio').checked;
+        _cfg.humanizer.display_name = document.getElementById('hz-dn').checked;
+        _cfg.humanizer.pronouns = document.getElementById('hz-pn').checked;
+        _cfg.humanizer.banner = document.getElementById('hz-bn').checked;
+        _cfg.humanizer.hypesquad = document.getElementById('hz-hs').checked;
+        _cfg.humanizer.retries = parseInt(document.getElementById('hz-ret').value) || 3;
+        
+        await pywebview.api.save_config(_cfg);
+        if (!autosaved) toast('Config saved successfully');
+    }
+
+    function toast(msg) {
+        const b = document.getElementById('toasts'), e = document.createElement('div');
+        e.className = 'toast'; e.textContent = msg; b.appendChild(e);
+        requestAnimationFrame(() => e.classList.add('show'));
+        setTimeout(() => { e.classList.remove('show'); setTimeout(() => e.remove(), 300); }, 2500);
+    }
+
+    async function loadInputFilesList() {
+        if (!window.pywebview?.api) return;
+        
+        const inputSel = document.getElementById('input-files-list');
+        const outputSel = document.getElementById('output-files-list');
+        
+        inputSel.innerHTML = '<option value="">-- Select Input File --</option>';
+        outputSel.innerHTML = '<option value="">-- Select Output File --</option>';
+        
+        console.log('[DEBUG] Calling get_input_files...');
+        const files = await pywebview.api.get_input_files();
+        console.log('[DEBUG] Files received:', files);
+        
+        if (files && files.length > 0) {
+            console.log('[DEBUG] Processing files...');
+            files.forEach(f => {
+                console.log('[DEBUG] Processing:', f);
+                if (f.startsWith('input/')) {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f.replace('input/', '');
+                    inputSel.appendChild(opt);
+                } else if (f.startsWith('output/')) {
+                    const opt = document.createElement('option');
+                    opt.value = f;
+                    opt.textContent = f.replace('output/', '');
+                    outputSel.appendChild(opt);
+                }
+            });
+            console.log('[DEBUG] Files loaded successfully');
+        }
+    }
+    
+    let _currentFile = null;
+
+    async function selectInputFile() {
+        const file = document.getElementById('input-files-list').value;
+        if (!file) {
+            document.getElementById('output-files-list').value = '';
+            _currentFile = null;
+            document.getElementById('input-editor').value = '';
+            document.getElementById('current-file-display').textContent = 'No file selected';
+            return;
+        }
+        _currentFile = file;
+        document.getElementById('output-files-list').value = '';
+        document.getElementById('current-file-display').textContent = file;
+        document.getElementById('input-editor').value = await pywebview.api.read_input_file(file);
+    }
+
+    async function selectOutputFile() {
+        const file = document.getElementById('output-files-list').value;
+        if (!file) {
+            document.getElementById('input-files-list').value = '';
+            _currentFile = null;
+            document.getElementById('input-editor').value = '';
+            document.getElementById('current-file-display').textContent = 'No file selected';
+            return;
+        }
+        _currentFile = file;
+        document.getElementById('input-files-list').value = '';
+        document.getElementById('current-file-display').textContent = file;
+        document.getElementById('input-editor').value = await pywebview.api.read_input_file(file);
+    }
+
+    async function saveCurrentFile() {
+        if (!_currentFile) { 
+            toast('Select a file first'); 
+            return; 
+        }
+        const content = document.getElementById('input-editor').value;
+        await pywebview.api.save_input_file(_currentFile, content);
+        toast(`File saved: ${_currentFile}`);
+    }
+
+    async function refreshFileLists() {
+        console.log('[DEBUG] Refreshing file lists...');
+        await loadInputFilesList();
+        toast('File list refreshed');
+    }
+
+    async function loadInputFile() {
+        selectInputFile();
+    }
+
+    function toggleAutoSave(type) {
+        if (type === 'settings') {
+            const enabled = document.getElementById('cfg-autosave').checked;
+            localStorage.setItem('autosave_cfg', enabled);
+            if (enabled) {
+                saveCfg(true);
+                startConfigAutoSave();
+            } else {
+                stopConfigAutoSave();
+            }
+        } else {
+            const enabled = document.getElementById('file-autosave').checked;
+            localStorage.setItem('autosave_file', enabled);
+            if (enabled) {
+                saveInputFile(true);
+                startFileAutoSave();
+            } else {
+                stopFileAutoSave();
+            }
+        }
+    }
+
+    let _cfgAutoSaveInterval = null;
+    let _fileAutoSaveInterval = null;
+
+    function startConfigAutoSave() {
+        if (_cfgAutoSaveInterval) return;
+        _cfgAutoSaveInterval = setInterval(() => {
+            const isEnabled = document.getElementById('cfg-autosave').checked;
+            if (isEnabled) saveCfg(true);
+        }, 5000);
+    }
+
+    function stopConfigAutoSave() {
+        if (_cfgAutoSaveInterval) {
+            clearInterval(_cfgAutoSaveInterval);
+            _cfgAutoSaveInterval = null;
+        }
+    }
+
+    function startFileAutoSave() {
+        if (_fileAutoSaveInterval) return;
+        _fileAutoSaveInterval = setInterval(() => {
+            const isEnabled = document.getElementById('file-autosave').checked;
+            if (isEnabled && _currentFile) {
+                const content = document.getElementById('input-editor').value;
+                pywebview.api.save_input_file(_currentFile, content);
+            }
+        }, 5000);
+    }
+
+    function stopFileAutoSave() {
+        if (_fileAutoSaveInterval) {
+            clearInterval(_fileAutoSaveInterval);
+            _fileAutoSaveInterval = null;
+        }
+    }
+
+    // Initialize App
+    window.addEventListener('DOMContentLoaded', () => {
+        startLogs();
+        if (window.pywebview?.api) { 
+            loadCfg();
+            
+            setTimeout(() => {
+                console.log('[INIT] Loading file lists after delay...');
+                refreshFileLists();
+            }, 500);
+            
+            const autosaveCfg = localStorage.getItem('autosave_cfg') === 'true';
+            const autosaveFile = localStorage.getItem('autosave_file') === 'true';
+            
+            if (autosaveCfg) {
+                document.getElementById('cfg-autosave').checked = true;
+                startConfigAutoSave();
+            }
+            if (autosaveFile) {
+                document.getElementById('file-autosave').checked = true;
+                startFileAutoSave();
+            }
+        }
+    });
+
+    function showHumanizerDialog() {
+        const mode = prompt('Humanizer Mode:\n[1] All tokens\n[2] All tokens with proxies\n[3] Cancel', '1');
+        if (mode === '1') run('humanizer', 'all');
+        if (mode === '2') run('humanizer', 'all_proxy');
+    }
+
+    function showHumanizerDialog() {
+        const mode = prompt('Humanizer Mode:\n[1] All tokens\n[2] All tokens with proxies\n[3] Cancel', '1');
+        if (mode === '1') run('humanizer', 'all');
+        if (mode === '2') run('humanizer', 'all_proxy');
+    }
+
+    // IP VANISH Ignore Raw IPs Management
+    let _ipVisibilityState = false;  // 初期状態は隠す
+    
+    function toggleIPVisibility() {
+        _ipVisibilityState = !_ipVisibilityState;
+        const btn = document.getElementById('ip-visibility-toggle');
+        btn.textContent = _ipVisibilityState ? 'Unhide' : 'Hide';
+        refreshIgnoreIPsList();
+    }
+    
+    function refreshIgnoreIPsList(ips = null) {
+        const container = document.getElementById('ignore-ips-list');
+        
+        if (ips === null) {
+            ips = _cfg?.ip_vanish?.ignore_raw_ips || [];
+        }
+        
+        container.innerHTML = '';
+        
+        if (!ips || ips.length === 0) {
+            container.innerHTML = '<div style="color: var(--text-dim); padding: 10px; text-align: center;">No IPs added yet</div>';
+            return;
+        }
+        
+        ips.forEach((ip, idx) => {
+            const item = document.createElement('div');
+            item.style.display = 'flex';
+            item.style.justifyContent = 'space-between';
+            item.style.alignItems = 'center';
+            item.style.padding = '12px 10px';
+            item.style.borderBottom = '1px solid var(--border)';
+            item.style.fontSize = '16px';
+            item.style.fontFamily = 'JetBrains Mono, monospace';
+            item.style.fontWeight = '600';
+            
+            // IP 表示 (隠す場合は全部 * にする)
+            const displayIP = _ipVisibilityState ? ip : '*'.repeat(ip.length);
+            
+            item.innerHTML = `
+                <span style="letter-spacing: 2px;">${displayIP}</span>
+                <button class="btn btn-s" style="padding: 6px 12px; font-size: 11px;" onclick="removeIgnoreIP(${idx})">Remove</button>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function addIgnoreIP() {
+        const input = document.getElementById('new-ignore-ip');
+        const ip = input.value.trim();
+        
+        if (!ip) {
+            toast('Please enter an IP address');
+            return;
+        }
+        
+        if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(ip)) {
+            toast('Invalid IP format');
+            return;
+        }
+        
+        // 設定から現在のリストを取得
+        const currentIps = _cfg?.ip_vanish?.ignore_raw_ips || [];
+        if (currentIps.includes(ip)) {
+            toast('IP already in list');
+            return;
+        }
+        
+        currentIps.push(ip);
+        _cfg.ip_vanish.ignore_raw_ips = currentIps;
+        refreshIgnoreIPsList(currentIps);
+        input.value = '';
+        toast(`Added IP: ${ip}`);
+    }
+
+    function removeIgnoreIP(idx) {
+        const currentIps = _cfg?.ip_vanish?.ignore_raw_ips || [];
+        const removed = currentIps.splice(idx, 1)[0];
+        _cfg.ip_vanish.ignore_raw_ips = currentIps;
+        refreshIgnoreIPsList(currentIps);
+        toast(`Removed IP: ${removed}`);
+    }
+
+    function clearIgnoreIPs() {
+        if (confirm('Clear all ignored IPs?')) {
+            _cfg.ip_vanish.ignore_raw_ips = [];
+            refreshIgnoreIPsList([]);
+            toast('All IPs cleared');
+        }
+    }
+
+    // Multi Tools Functions
+    function startSpammer() {
+        const guildId = document.getElementById('spam-guild-id').value.trim();
+        const channelIds = document.getElementById('spam-channel-ids').value.trim();
+        const message = document.getElementById('spam-message').value.trim();
+        const delay = parseFloat(document.getElementById('spam-delay').value) || 2;
+        const limit = parseInt(document.getElementById('spam-limit').value) || 0;
+        const mentionAll = document.getElementById('spam-mention-all').checked;
+        const randomize = document.getElementById('spam-randomize').checked;
+        const mentionIds = document.getElementById('spam-mention-ids').value.trim();
+        const mentionCount = parseInt(document.getElementById('spam-mention-count').value) || 1;
+        const pollTitle = document.getElementById('spam-poll-title').value.trim();
+        const pollAnswers = document.getElementById('spam-poll-answers').value.trim();
+
+        if (!guildId || !channelIds || !message) {
+            toast('Please fill in Guild ID, Channel IDs, and Message');
+            return;
+        }
+
+        const config = {
+            guild_id: guildId,
+            channel_ids: channelIds.split(/[,\s]+/).filter(Boolean),
+            message: message,
+            delay: delay,
+            limit: limit,
+            mention_all: mentionAll,
+            randomize: randomize,
+            mention_ids: mentionIds ? mentionIds.split(/[,\s]+/).filter(Boolean) : [],
+            mention_count: mentionCount,
+            poll_title: pollTitle || null,
+            poll_answers: pollAnswers ? pollAnswers.split(/[,\s]+/).filter(Boolean) : []
+        };
+
+        toast('Spammer started - See console for details');
+        run('multi_spammer', JSON.stringify(config));
+    }
+
+    function startFakeTyper() {
+        const guildId = document.getElementById('typer-guild-id').value.trim();
+        const channelId = document.getElementById('typer-channel-id').value.trim();
+        const duration = parseInt(document.getElementById('typer-duration').value) || 10;
+        const interval = parseInt(document.getElementById('typer-interval').value) || 30;
+        const typingDuration = parseInt(document.getElementById('typer-typing-duration').value) || 5;
+
+        if (!guildId || !channelId) {
+            toast('Please fill in Guild ID and Channel ID');
+            return;
+        }
+
+        const config = {
+            guild_id: guildId,
+            channel_id: channelId,
+            duration: duration,
+            interval: interval,
+            typing_duration: typingDuration
+        };
+
+        toast('Fake Typer started - See console for details');
+        run('multi_typer', JSON.stringify(config));
+    }
+    </script>
+</body>
+</html>

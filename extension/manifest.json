@@ -1,0 +1,53 @@
+{
+    "update_url": "https://clients2.google.com/service/update2/crx",
+    "name": "Local Captcha Solver",
+    "version": "0.5.6",
+    "description": "Local automated captcha solving extension.",
+    "content_scripts": [
+        {
+            "matches": [
+                "*://*.hcaptcha.com/captcha/*"
+            ],
+            "js": [
+                "captcha/hcaptcha.js"
+            ],
+            "run_at": "document_start",
+            "all_frames": true
+        },
+        {
+            "matches": [
+                "*://*.hcaptcha.com/captcha/*"
+            ],
+            "include_globs": [
+                "*frame=challenge*"
+            ],
+            "js": [
+                "captcha/hook.js"
+            ],
+            "all_frames": true,
+            "run_at": "document_end",
+            "world": "MAIN"
+        }
+    ],
+    "manifest_version": 3,
+    "permissions": [
+        "debugger",
+        "declarativeNetRequest",
+        "storage",
+        "scripting"
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "action": {
+        "default_title": "Local Captcha Solver",
+        "default_popup": "popup.html"
+    },
+    "host_permissions": [
+        "<all_urls>"
+    ],
+    "minimum_chrome_version": "100.0",
+    "version_name": "v0.5.6",
+    "short_name": "Local Solver"
+}

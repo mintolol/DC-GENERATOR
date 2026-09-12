@@ -1,0 +1,37 @@
+{
+    "verification": {
+        "enabled": true
+    },
+    "ip_vanish": {
+        "enabled": false,
+        "ignore_raw_ips": [
+        ]
+    },
+    "cloudflare_warp": {
+        "enabled": false,
+        "auto_rotate": false,
+        "rotate_before_gen": false
+    },
+    "threading": {
+        "generator": 1,
+        "joiner": 100,
+        "proxy_checker": 50,
+        "checker": 10,
+        "humanizer": 3,
+        "ratelimit_countdown": 1
+    },
+    "humanizer": {
+        "enabled": false,
+        "avatar": true,
+        "bio": true,
+        "display_name": true,
+        "pronouns": true,
+        "banner": false,
+        "hypesquad": true,
+        "retries": 1
+    },
+    "logs": false,
+    "censor": true,
+    "ui_mode": "gui"
+    }
+}
