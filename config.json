@@ -4,8 +4,7 @@
     },
     "ip_vanish": {
         "enabled": false,
-        "ignore_raw_ips": [
-        ]
+        "ignore_raw_ips": []
     },
     "cloudflare_warp": {
         "enabled": false,
@@ -33,5 +32,4 @@
     "logs": false,
     "censor": true,
     "ui_mode": "gui"
-    }
 }
